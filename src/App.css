@@ -1,8 +1,17 @@
-table, td {
+table {
   border: 1px solid black;
   border-collapse: collapse;
   width: 80%;
   margin: auto;
+}
+tr td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  text-align: right;
+}
+tr td:first-child {
+  text-align: left;
+  width: 60%;
 }
 
 .details-header {
@@ -10,4 +19,24 @@ table, td {
   padding-block-end: 0.83em;
   margin-block-start: 0;
   background-color: lightgrey;
+}
+
+textarea {
+  height: 5em;
+}
+
+form {
+  margin: 1em auto;
+  width: 80%;
+}
+
+form fieldset {
+  border: 1px solid lightgrey;
+}
+
+input, textarea {
+  width: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
 }
