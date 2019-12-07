@@ -9,6 +9,9 @@ tr td {
   border-collapse: collapse;
   text-align: right;
 }
+td, th {
+  padding: 0.3em;
+}
 tr td:first-child {
   text-align: left;
   width: 60%;
@@ -19,6 +22,24 @@ tr td:first-child {
   padding-block-end: 0.83em;
   margin-block-start: 0;
   background-color: lightgrey;
+  margin: -0.2em;
+  padding: 0.3em;
+}
+
+.comment {
+  border: 1px solid lightgrey;
+  padding: .3em;
+  margin: .3em;
+}
+
+p.comment-mesage {
+  margin-left: 1em;
+}
+
+button.delete-button {
+  background-color: red;
+  float: right;
+  color: white;
 }
 
 textarea {
