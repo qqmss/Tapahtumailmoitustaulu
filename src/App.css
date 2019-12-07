@@ -36,10 +36,51 @@ p.comment-mesage {
   margin-left: 1em;
 }
 
+div.created-time {
+  float: right;
+}
+
 button.delete-button {
   background-color: red;
   float: right;
   color: white;
+}
+
+.error-notification {
+  border-style: solid;
+  color: red;
+  border-width: 4px;
+  border-radius: 6px;
+  font-size: 2em;
+  margin: 20px;
+  background-color: lightgrey;
+  padding: 4px;
+}
+
+.success-notification {
+  border-style: solid;
+  color: green;
+  border-width: 4px;
+  border-radius: 6px;
+  font-size: 2em;
+  margin: 20px;
+  background-color: lightgrey;
+  padding: 4px;
+}
+
+.notification {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  opacity: 0.95;
+}
+
+.notification button {
+  float: right;
+}
+
+button.show-all-event-details {
+  float: left;
 }
 
 textarea {

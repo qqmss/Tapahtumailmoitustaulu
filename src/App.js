@@ -3,11 +3,14 @@ import './App.css';
 import eventService from './services/events'
 import commentService from './services/comments'
 
-const EventTable = ({ events, comments, handleShowEventClick, handleJoinEventClick, handleDeleteEventClick, eventsToShowDetails, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => (
+const EventTable = ({ events, comments, handleShowEventClick, handleJoinEventClick, handleDeleteEventClick, eventsToShowDetails, setEventsToShowDetails, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => (
   <table>
     <thead>
       <tr>
-        <th>Tapahtuma</th>
+        <th>
+          <button className='show-all-event-details' onClick={() => setEventsToShowDetails(events.map(event => event.id))}>Näytä</button>
+          <button className='show-all-event-details' onClick={() => setEventsToShowDetails([])}>Piilota</button>
+          Tapahtuma</th>
         <th>Paikka</th>
         <th>Aika</th>
       </tr>
@@ -30,6 +33,7 @@ const Event = ({ event, comments, handleShowEventClick, handleJoinEventClick, ha
       <tr>
         <td colSpan="3">
           <h2 className='details-header' onClick={handleShowEventClick}>{event.name}</h2>
+          <div className='created-time'>Luotu: {event.createdTime.toLocaleString()}<br /><button className='delete-button' onClick={handleDeleteEventClick} >Poista</button></div>
           <h3>Paikka</h3>
           <p>{event.location}</p>
           <h3>Aika</h3>
@@ -39,7 +43,6 @@ const Event = ({ event, comments, handleShowEventClick, handleJoinEventClick, ha
           <h3>Osallistujat</h3>
           <p>{event.participants}</p>
           <button onClick={handleJoinEventClick}>Osallistu</button>
-          <button className='delete-button' onClick={handleDeleteEventClick} >Poista</button>
           <h3>Kommentit</h3>
           <Comments comments={comments.filter(comment => comment.eventId === event.id)} eventId={event.id} setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
         </td>
@@ -96,7 +99,7 @@ const Comments = ({ comments, eventId, setCommentFormEventId, commentFormEventId
 const Comment = ({ comment, handleDeleteCommentClick }) => {
   return (
     <div className='comment'>
-      <div className='comment-author'>{comment.author} <button className='delete-button' onClick={handleDeleteCommentClick}>Poista</button></div>
+      <div className='comment-author'>{comment.author} {comment.createdTime.toLocaleString()}<button className='delete-button' onClick={handleDeleteCommentClick}>Poista</button></div>
       <p className='comment-mesage'>{comment.message}</p>
     </div>
   )
@@ -125,38 +128,31 @@ const CommentForm = ({ handleCommentSubmit, newAuthor, setNewAuthor, newMessage,
   }
 }
 
+const ErrorNotification = ({ message, setErrorMessage }) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className='error-notification'>
+      {message}
+      <button onClick={() => setErrorMessage(null)}>Sulje</button>
+    </div>
+  )
+}
+
+const SuccessNotification = ({ message, setSuccessMessage }) => {
+  if (message === null) {
+    return null
+  }
+  return (
+    <div className='success-notification'>
+      {message}
+      <button onClick={() => setSuccessMessage(null)}>Sulje</button>
+    </div>
+  )
+}
+
 function App() {
-  /*
-  const LocalEvents = [
-    {
-      id: 1,
-      name: 'Konsertti 1',
-      location: 'Oulu',
-      time: new Date('1995-12-18T03:24:00'),
-      description: 'laulua',
-      participants: 1234,
-      createdTime: new Date('1994-11-18T03:24:00')
-    },
-    {
-      id: 2,
-      name: 'Konsertti 2',
-      location: 'Vaasa',
-      time: new Date('1995-12-19T03:24:00'),
-      description: 'musiikkia',
-      participants: 285,
-      createdTime: new Date('1994-11-19T03:24:00')
-    },
-    {
-      id: 3,
-      name: 'Kävely',
-      location: 'kuu',
-      time: new Date('1995-12-20T03:24:00'),
-      description: 'ei ilmaa',
-      participants: 3,
-      createdTime: new Date('1994-11-20T03:24:00')
-    }
-  ]
-  */
   const [newName, setNewName] = useState('')
   const [newLocation, setNewLocation] = useState('')
   const [newTime, setNewTime] = useState('')
@@ -167,6 +163,9 @@ function App() {
   const [eventsToShowDetails, setEventsToShowDetails] = useState([])
   const [events, setEvents] = useState([])
   const [comments, setComments] = useState([])
+  const [errorMessage, setErrorMessage] = useState(null)
+  const [successMessage, setSuccessMessage] = useState(null)
+
 
   useEffect(() => {
     eventService.getAll()
@@ -179,7 +178,6 @@ function App() {
   }, [commentFormEventId])
 
   const handleShowEventClick = (idShow) => {
-    console.log('handleShowEventClick event', idShow)
     if (eventsToShowDetails.includes(idShow)) {
       setEventsToShowDetails(eventsToShowDetails.filter(id => id !== idShow))
     } else {
@@ -195,15 +193,24 @@ function App() {
   }
 
   const handleJoinEventClick = (idJoin) => {
-    console.log('handleJoinEventClick event', idJoin)
     const participants = events.find(event => event.id === idJoin).participants
     eventService
       .update(idJoin, { participants: participants + 1 })
       .then(data => {
         setEvents(events.map(event => event.id !== data.id ? event : data))
+        setSuccessMessage(`Osallistuit tapahtumaan "${data.name}".`)
+        window.setTimeout(() => setSuccessMessage(null), 5000)
       })
       .catch(error => {
-        window.alert('jo poistetu')
+        console.log(error.response.data.error)
+        if (error.response.status === 404) {
+          setErrorMessage(`Tapahtuma ${events.find(event => event.id === idJoin).name} oli poistettu palvelimelta`)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+          setEvents(events.filter(event => event.id !== idJoin))
+        } else {
+          setErrorMessage(error.response.data.error)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        }
       })
   }
 
@@ -214,7 +221,6 @@ function App() {
       location: newLocation,
       time: new Date(newTime),
       description: newDescription,
-      participants: 0
     }
     eventService
       .create(newEvent)
@@ -224,25 +230,38 @@ function App() {
         setNewLocation('')
         setNewTime('')
         setNewDescription('')
+        setSuccessMessage(`Tapahtuma ${data.name} luotu.`)
+        window.setTimeout(() => setSuccessMessage(null), 5000)
+      })
+      .catch(error => {
+        console.log(error.response.data.error)
+        if (error.response.status === 400) {
+          setErrorMessage(`Täytä uuden tapahtuman kentät`)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        } else {
+          setErrorMessage(error.response.data.error)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        }
       })
   }
 
   const handleDeleteEventClick = (idDelete) => {
-    console.log('handleDeleteEvent event', idDelete)
     eventService
       .erase(idDelete)
       .then(() => {
+        setSuccessMessage(`Tapahtuma ${events.find(event => event.id === idDelete).name} poistettu.`)
+        window.setTimeout(() => setSuccessMessage(null), 5000)
         setEvents(events.filter(event => event.id !== idDelete))
         setEventsToShowDetails(eventsToShowDetails.filter(id => id !== idDelete))
       })
       .catch(error => {
-        window.alert('Poistaminen epäonnistui')
+        setErrorMessage(error.response.data.error)
+        window.setTimeout(() => setErrorMessage(null), 5000)
       })
   }
 
   const handleCommentSubmit = (event) => {
     event.preventDefault()
-    console.log('handleCommentSubmit event')
     const newComment = {
       author: newAuthor,
       message: newMessage
@@ -254,20 +273,48 @@ function App() {
         setNewAuthor('')
         setNewMessage('')
       })
+      .catch(error => {
+        console.log(error.response.data.error)
+        if (error.response.status === 404) {
+          setErrorMessage(`Tapahtuma ${events.find(event => event.id === commentFormEventId).name} oli poistettu palvelimelta.`)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+          setEvents(events.filter(event => event.id !== commentFormEventId))
+        } else if (error.response.status === 400) {
+          setErrorMessage(`Täytä uuden kommentin kentät`)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        } else {
+          setErrorMessage(error.response.data.error)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        }
+      })
   }
 
   const handleDeleteCommentClick = (eventId, commentId) => {
-    console.log('handleDeleteCommentClick event', eventId, commentId)
     commentService.erase(eventId, commentId)
       .then(() => setComments(comments.filter(comment => comment.id !== commentId)))
+      .catch(error => {
+        console.log(error.response.data.error)
+        if (error.response.status === 404) {
+          setErrorMessage(`Tapahtuma ${events.find(event => event.id === eventId).name} oli poistettu palvelimelta.`)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+          setEvents(events.filter(event => event.id !== eventId))
+        } else {
+          setErrorMessage(error.response.data.error)
+          window.setTimeout(() => setErrorMessage(null), 5000)
+        }
+      })
   }
 
   return (
     <div className="App">
+      <div className='notification'>
+        <ErrorNotification message={errorMessage} setErrorMessage={setErrorMessage} />
+        <SuccessNotification message={successMessage} setSuccessMessage={setSuccessMessage} />
+      </div>
       <h1>Ilmoitustaulu</h1>
       <EventTable events={events} comments={comments} handleShowEventClick={handleShowEventClick} handleJoinEventClick={handleJoinEventClick}
-        handleDeleteEventClick={handleDeleteEventClick} eventsToShowDetails={eventsToShowDetails} setCommentFormEventId={setCommentFormEventId}
-        commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor}
+        handleDeleteEventClick={handleDeleteEventClick} eventsToShowDetails={eventsToShowDetails} setEventsToShowDetails={setEventsToShowDetails}
+        setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor}
         newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
       <EventForm handleEventSubmit={handleEventSubmit} newName={newName} setNewName={setNewName} newLocation={newLocation} setNewLocation={setNewLocation}
         newTime={newTime} setNewTime={setNewTime} newDescription={newDescription} setNewDescription={setNewDescription} />

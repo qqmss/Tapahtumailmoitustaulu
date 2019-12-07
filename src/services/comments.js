@@ -9,6 +9,7 @@ const getAll = (eventId) => {
     .then(data => {
       data.forEach(comment => {
         comment.createdTime = new Date(comment.createdTime)
+        comment.eventId = eventId
       })
       return data
     })
@@ -20,6 +21,7 @@ const create = (eventId, comment) => {
     .then(response => response.data)
     .then(SaveComment => {
       SaveComment.createdTime = new Date(SaveComment.createdTime)
+      SaveComment.eventId = eventId
       return SaveComment
     })
 }
