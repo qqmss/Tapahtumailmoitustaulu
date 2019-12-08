@@ -61,7 +61,7 @@ const Event = ({ event, comments, handleShowEventClick, handleJoinEventClick, ha
 
 const EventForm = ({ handleEventSubmit, newName, setNewName, newLocation, setNewLocation, newTime, setNewTime, newDescription, setNewDescription }) => {
   return (
-    <form onSubmit={handleEventSubmit}>
+    <form onSubmit={handleEventSubmit} className='event-form'>
       <fieldset>
         <legend>Uusi tapahtuma</legend>
         <label>
@@ -99,7 +99,7 @@ const Comments = ({ comments, eventId, setCommentFormEventId, commentFormEventId
 const Comment = ({ comment, handleDeleteCommentClick }) => {
   return (
     <div className='comment'>
-      <div className='comment-author'>{comment.author} {comment.createdTime.toLocaleString()}<button className='delete-button' onClick={handleDeleteCommentClick}>Poista</button></div>
+      <div className='comment-author'><em>{comment.author} {comment.createdTime.toLocaleString()}</em><button className='delete-button' onClick={handleDeleteCommentClick}>Poista</button></div>
       <p className='comment-mesage'>{comment.message}</p>
     </div>
   )
@@ -108,7 +108,7 @@ const Comment = ({ comment, handleDeleteCommentClick }) => {
 const CommentForm = ({ handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, commentFormEventId, eventId }) => {
   if (commentFormEventId === eventId) {
     return (
-      <form onSubmit={handleCommentSubmit}>
+      <form onSubmit={handleCommentSubmit} className='comment-form'>
         <fieldset>
           <legend>Uusi kommentti</legend>
           <label>

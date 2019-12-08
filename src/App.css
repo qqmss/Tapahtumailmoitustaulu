@@ -1,35 +1,57 @@
 table {
-  border: 1px solid black;
-  border-collapse: collapse;
-  width: 80%;
-  margin: auto;
-}
-tr td {
-  border: 1px solid black;
-  border-collapse: collapse;
-  text-align: right;
+    border-collapse:separate;
+    border: 1px solid #dddddd;
+    border-radius:7px;
+    border-spacing: 0px;
+    width: 80%;
+    margin: auto;
+    overflow: hidden;
 }
 td, th {
-  padding: 0.3em;
+    border-left: 1px solid #dddddd;
+    border-top: 1px solid #dddddd;
+    padding: 0.5em;
 }
-tr td:first-child {
-  text-align: left;
-  width: 60%;
+th {
+    border-top: none;
+    background-color: white;
+}
+td:first-child, th:first-child {
+     border-left: none;
+}
+td[colspan] {
+  background-color: white;
+}
+tr:nth-child(even) {
+  background: #f9f9f9
+}
+tr:hover {
+  background-color: #bdbdbd;
+}
+
+h1 {
+  margin-left: 10%;
 }
 
 .details-header {
   padding-block-start: 0.83em;
   padding-block-end: 0.83em;
   margin-block-start: 0;
-  background-color: lightgrey;
-  margin: -0.2em;
+  background-color: #bdbdbd;
+  margin: -0.34em;
+  margin-bottom: 0;
   padding: 0.3em;
+}
+.details-header:hover {
+  background-color: #898989;
+  color:white;
 }
 
 .comment {
-  border: 1px solid lightgrey;
+  border: 1px solid #dddddd;
   padding: .3em;
   margin: .3em;
+  border-radius: 7px;
 }
 
 p.comment-mesage {
@@ -40,31 +62,45 @@ div.created-time {
   float: right;
 }
 
+button {
+  border-radius: 2px;
+  border-width: 1px;
+  padding: 0.22em;
+  border: 1px solid #898989;
+}
+button:hover {
+  background-color: #bdbdbd;
+}
+
 button.delete-button {
-  background-color: red;
+  background-color: #d9534f;
+  border-color: #d43f3a;
   float: right;
   color: white;
+}
+button.delete-button:hover{
+  background-color: #d43f3a;
 }
 
 .error-notification {
   border-style: solid;
-  color: red;
+  color: #a94442;
   border-width: 4px;
-  border-radius: 6px;
+  border-radius: 7px;
   font-size: 2em;
   margin: 20px;
-  background-color: lightgrey;
+  background-color: #f2dede;
   padding: 4px;
 }
 
 .success-notification {
   border-style: solid;
-  color: green;
+  color: #3c763d;
   border-width: 4px;
-  border-radius: 6px;
+  border-radius: 7px;
   font-size: 2em;
   margin: 20px;
-  background-color: lightgrey;
+  background-color: #dff0d8;
   padding: 4px;
 }
 
@@ -93,7 +129,16 @@ form {
 }
 
 form fieldset {
-  border: 1px solid lightgrey;
+  border: 1px solid #dddddd;
+  border-radius: 7px;
+}
+
+.event-form fieldset {
+  background-color: #f9f9f9;
+}
+
+.comment-form fieldset {
+  background-color: #f9f9f9;
 }
 
 input, textarea {
@@ -101,4 +146,5 @@ input, textarea {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  border: #dddddd 1px solid;
 }
