@@ -1,3 +1,11 @@
+/**
+ * Web-sovellus ilmoitustaulu front-end module.
+ * @module App
+ * @type {object}
+ * @version 1.0.0
+ * @author mika
+ */
+
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import eventService from './services/events'
@@ -5,7 +13,12 @@ import commentService from './services/comments'
 import EventTable from  './components/EventTable'
 import EventForm from './components/EventForm'
 
-
+/**
+ * Komponetti virheilmoitukselle. 
+ * @param {string} message - Näytettävä virheviesti.
+ * @param {function(string)} setErrorMessage - Muuttaa virheviestin.
+ * @returns {object} Virheilmoitus komponetti.
+ */
 const ErrorNotification = ({ message, setErrorMessage }) => {
   if (message === null) {
     return null
@@ -18,6 +31,12 @@ const ErrorNotification = ({ message, setErrorMessage }) => {
   )
 }
 
+/**
+ * Komponetti tapahtumien tapahtumisen ilmoittamiseksi.
+ * @param {string} message - Näytettävä viesti.
+ * @param {function(string)} setSuccessMessage - Muuttaa viestin.
+ * @returns {object} Ilmoitus komponentti.
+ */
 const SuccessNotification = ({ message, setSuccessMessage }) => {
   if (message === null) {
     return null
@@ -30,18 +49,58 @@ const SuccessNotification = ({ message, setSuccessMessage }) => {
   )
 }
 
+/**
+ * ilmoitustaulu app
+ * @returns {object} ilmoitustaulu komponentti
+ */
 function App() {
+  /**
+   * @type {[string, function(string)]} - Tapahtuman nimi ja sen muuttaja.
+   */
   const [newName, setNewName] = useState('')
+  /**
+   * @type {[string, function(string)]} - Tapahtuman paikka ja sen muuttaja.
+   */
   const [newLocation, setNewLocation] = useState('')
+  /**
+   * @type {[string, function(string)]} - Tapahtuman aika ja sen muuttaja.
+   */
   const [newTime, setNewTime] = useState('')
+  /**
+   * @type {[string, function(string)]} - Tapahtuman kuvaus ja sen muuttaja.
+   */
   const [newDescription, setNewDescription] = useState('')
+  /**
+   * @type {[string, function(string)]} - Kommentin kirjoittaja ja sen muuttaja
+   */
   const [newAuthor, setNewAuthor] = useState('')
+  /**
+  *@type {[string, function(string)]} - Kommentin viesti ja sen muuttaja.
+  */
   const [newMessage, setNewMessage] = useState('')
+  /**
+   * @type {[string, function(string)]} - Kommentoitavan tapahtuman id ja sen muuttaja.
+   */
   const [commentFormEventId, setCommentFormEventId] = useState('')
+  /**
+   * @type {[string[], function(string[])]} - Tapahtumien id:t, joista näytetään lisätiedot ja sen muuttaja.
+   */
   const [eventsToShowDetails, setEventsToShowDetails] = useState([])
+  /**
+   * @type {[object[], function(object[])]} - Tapahtumi kuvaavat oliot ja niiden muuttaja.
+   */
   const [events, setEvents] = useState([])
+  /**
+   * @type {[object[], function(object[])]} - Kommentteja kuvaavat oliot ja niiden muuttaja.
+   */
   const [comments, setComments] = useState([])
+  /**
+   * @type {[(string|null), function(string|null)]} - Virheilmoitus viesti ja sen muuttaja 
+   */
   const [errorMessage, setErrorMessage] = useState(null)
+  /**
+   * @type {[(string|null), function(string|null)]} - Ilmoitus viesti ja sen muuttaja 
+   */
   const [successMessage, setSuccessMessage] = useState(null)
 
 
@@ -55,6 +114,10 @@ function App() {
     setNewMessage('')
   }, [commentFormEventId])
 
+  /**
+   * Näyttää tapahtuman lisätiedot ja hakee sen kommentit.
+   * @param {string} idShow - Tapahtuman jonka lisätiedot näytetään id.
+   */
   const handleShowEventClick = (idShow) => {
     if (eventsToShowDetails.includes(idShow)) {
       setEventsToShowDetails(eventsToShowDetails.filter(id => id !== idShow))
@@ -69,7 +132,12 @@ function App() {
       }
     }
   }
-
+  
+  /**
+   * Lisää tapahtumalle osallistujan. Ilmoittaa onnistumisesta tai epäonnistumisesta.
+   * Jos tapahtuma oli jo poistettu, päivittää näkymän vastaamaan sitä.
+   * @param {string} idJoin - Tapahtuman johon lisätään osallistuja id.
+   */
   const handleJoinEventClick = (idJoin) => {
     const participants = events.find(event => event.id === idJoin).participants
     eventService
@@ -92,6 +160,11 @@ function App() {
       })
   }
 
+  /**
+   * Lisää tapahtuman lomakkeen tiedoista. Ilmoittaa lomakkeen puutteista.
+   * Ilmoittaa onnistumisesta tai epäonnistumisesta.
+   * @param {object} event - Form onSubmit Event.
+   */
   const handleEventSubmit = (event) => {
     event.preventDefault()
     const newEvent = {
@@ -123,6 +196,10 @@ function App() {
       })
   }
 
+  /**
+   * Poistaa tapahtuman.
+   * @param {string} idDelete - Poistettavan tapahtuman id
+   */
   const handleDeleteEventClick = (idDelete) => {
     eventService
       .erase(idDelete)
@@ -138,6 +215,11 @@ function App() {
       })
   }
 
+  /**
+   * Lisää tapahtumalle kommentin kommenttilomakkeen tiedoista. Ilmoittaa lomakkeen puutteista. 
+   * Ilmoittaa onnistumisesta tai epäonnistumisesta. Jos tapahtuma oli jo poistettu, päivittää näkymän vastaamaan sitä.
+   * @param {object} event Form onSubmit Event.
+   */
   const handleCommentSubmit = (event) => {
     event.preventDefault()
     const newComment = {
@@ -167,6 +249,11 @@ function App() {
       })
   }
 
+  /**
+   * Poistaa kommentin. Jos tapahtuma oli jo poistettu, päivittää näkymän vastaamaan sitä.
+   * @param {string} eventId - Poistettavan kommentin tapahtuman id.
+   * @param {string} commentId - Poistettavan kommentin id.
+   */
   const handleDeleteCommentClick = (eventId, commentId) => {
     commentService.erase(eventId, commentId)
       .then(() => setComments(comments.filter(comment => comment.id !== commentId)))
