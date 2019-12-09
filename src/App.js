@@ -2,131 +2,9 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import eventService from './services/events'
 import commentService from './services/comments'
+import EventTable from  './components/EventTable'
+import EventForm from './components/EventForm'
 
-const EventTable = ({ events, comments, handleShowEventClick, handleJoinEventClick, handleDeleteEventClick, eventsToShowDetails, setEventsToShowDetails, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => (
-  <table>
-    <thead>
-      <tr>
-        <th>
-          <button className='show-all-event-details' onClick={() => setEventsToShowDetails(events.map(event => event.id))}>Näytä</button>
-          <button className='show-all-event-details' onClick={() => setEventsToShowDetails([])}>Piilota</button>
-          Tapahtuma</th>
-        <th>Paikka</th>
-        <th>Aika</th>
-      </tr>
-    </thead>
-    <tbody>
-      <Events events={events} comments={comments} handleShowEventClick={handleShowEventClick} handleJoinEventClick={handleJoinEventClick} handleDeleteEventClick={handleDeleteEventClick} eventsToShowDetails={eventsToShowDetails} setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
-    </tbody>
-  </table>
-)
-
-const Events = ({ events, comments, handleShowEventClick, handleJoinEventClick, handleDeleteEventClick, eventsToShowDetails, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => {
-  return (
-    events.map(event => <Event key={event.id} event={event} comments={comments} handleShowEventClick={() => handleShowEventClick(event.id)} handleJoinEventClick={() => handleJoinEventClick(event.id)} handleDeleteEventClick={() => handleDeleteEventClick(event.id)} eventsToShowDetails={eventsToShowDetails} setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />)
-  )
-}
-
-const Event = ({ event, comments, handleShowEventClick, handleJoinEventClick, handleDeleteEventClick, eventsToShowDetails, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => {
-  if (eventsToShowDetails.includes(event.id)) {
-    return (
-      <tr>
-        <td colSpan="3">
-          <h2 className='details-header' onClick={handleShowEventClick}>{event.name}</h2>
-          <div className='created-time'>Luotu: {event.createdTime.toLocaleString()}<br /><button className='delete-button' onClick={handleDeleteEventClick} >Poista</button></div>
-          <h3>Paikka</h3>
-          <p>{event.location}</p>
-          <h3>Aika</h3>
-          <p>{event.time.toLocaleString()}</p>
-          <h3>Kuvaus</h3>
-          <p>{event.description}</p>
-          <h3>Osallistujat</h3>
-          <p>{event.participants}</p>
-          <button onClick={handleJoinEventClick}>Osallistu</button>
-          <h3>Kommentit</h3>
-          <Comments comments={comments.filter(comment => comment.eventId === event.id)} eventId={event.id} setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
-        </td>
-      </tr>
-    )
-  } else {
-    return (
-      <tr onClick={handleShowEventClick}>
-        <td>{event.name}</td>
-        <td>{event.location}</td>
-        <td>{event.time.toLocaleDateString()}</td>
-      </tr>
-    )
-  }
-}
-
-const EventForm = ({ handleEventSubmit, newName, setNewName, newLocation, setNewLocation, newTime, setNewTime, newDescription, setNewDescription }) => {
-  return (
-    <form onSubmit={handleEventSubmit} className='event-form'>
-      <fieldset>
-        <legend>Uusi tapahtuma</legend>
-        <label>
-          Tapahtuman nimi:
-        <input value={newName} onChange={event => setNewName(event.target.value)} />
-        </label>
-        <label>
-          Paikka:
-        <input value={newLocation} onChange={event => setNewLocation(event.target.value)} />
-        </label>
-        <label>
-          Aika:
-        <input type="datetime-local" value={newTime} onChange={event => setNewTime(event.target.value)} />
-        </label>
-        <label>
-          Kuvaus:<br />
-          <textarea value={newDescription} onChange={event => setNewDescription(event.target.value)} /><br />
-        </label>
-        <button type='submit'>Lähetä</button>
-      </fieldset>
-    </form>
-  )
-}
-
-const Comments = ({ comments, eventId, setCommentFormEventId, commentFormEventId, handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, handleDeleteCommentClick }) => {
-  return (
-    <div>
-      {comments.map(comment => <Comment key={comment.id} comment={comment} handleDeleteCommentClick={() => handleDeleteCommentClick(eventId, comment.id)} />)}
-      <button onClick={() => setCommentFormEventId(commentFormEventId !== eventId ? eventId : '')}>Lisää kommentti</button>
-      <CommentForm handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} commentFormEventId={commentFormEventId} eventId={eventId} />
-    </div>
-  )
-}
-
-const Comment = ({ comment, handleDeleteCommentClick }) => {
-  return (
-    <div className='comment'>
-      <div className='comment-author'><em>{comment.author} {comment.createdTime.toLocaleString()}</em><button className='delete-button' onClick={handleDeleteCommentClick}>Poista</button></div>
-      <p className='comment-mesage'>{comment.message}</p>
-    </div>
-  )
-}
-
-const CommentForm = ({ handleCommentSubmit, newAuthor, setNewAuthor, newMessage, setNewMessage, commentFormEventId, eventId }) => {
-  if (commentFormEventId === eventId) {
-    return (
-      <form onSubmit={handleCommentSubmit} className='comment-form'>
-        <fieldset>
-          <legend>Uusi kommentti</legend>
-          <label>
-            Nimi tai Nimimerkki:
-          <input value={newAuthor} onChange={event => setNewAuthor(event.target.value)} />
-          </label>
-          <label>
-            Viesti:
-          <textarea value={newMessage} onChange={event => setNewMessage(event.target.value)} />
-          </label>
-          <button type='submit'>Lähetä</button>
-        </fieldset>
-      </form>
-    )
-  } else {
-    return null
-  }
-}
 
 const ErrorNotification = ({ message, setErrorMessage }) => {
   if (message === null) {
@@ -314,8 +192,8 @@ function App() {
       <h1>Ilmoitustaulu</h1>
       <EventTable events={events} comments={comments} handleShowEventClick={handleShowEventClick} handleJoinEventClick={handleJoinEventClick}
         handleDeleteEventClick={handleDeleteEventClick} eventsToShowDetails={eventsToShowDetails} setEventsToShowDetails={setEventsToShowDetails}
-        setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} newAuthor={newAuthor} setNewAuthor={setNewAuthor}
-        newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
+        setCommentFormEventId={setCommentFormEventId} commentFormEventId={commentFormEventId} handleCommentSubmit={handleCommentSubmit} 
+        newAuthor={newAuthor} setNewAuthor={setNewAuthor} newMessage={newMessage} setNewMessage={setNewMessage} handleDeleteCommentClick={handleDeleteCommentClick} />
       <EventForm handleEventSubmit={handleEventSubmit} newName={newName} setNewName={setNewName} newLocation={newLocation} setNewLocation={setNewLocation}
         newTime={newTime} setNewTime={setNewTime} newDescription={newDescription} setNewDescription={setNewDescription} />
     </div>
